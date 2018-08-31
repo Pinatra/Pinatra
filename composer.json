@@ -1,0 +1,21 @@
+{
+    "name": "pinatra/framework",
+    "description": "Pinatra is a PHP verison of Sinatra: a DSL for quickly creating web applications in PHP with minimal effort.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "JohnLui",
+            "email": "wenhanlv@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pinatra\\": "src"
+        },
+        "files": ["src/FirePinatra.php"]
+    }
+}

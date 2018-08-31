@@ -16,11 +16,17 @@ Pinatra is a PHP verison of [Sinatra](https://github.com/sinatra/sinatra): a DSL
 
 ## Example
 
+### install
+
+```bash
+composer require pinatra/framework=dev-master
+```
+
 ```php
 require __DIR__.'/../vendor/autoload.php';
 
-get('/fuck', function() {
-  echo "string";
+get('/hi', function() {
+  echo "I am Pinatra framework!";
 });
 ```
 
