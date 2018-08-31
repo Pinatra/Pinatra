@@ -30,7 +30,9 @@ get('/hi', function() {
 });
 ```
 
+## developing logs
 
+* 2018-08-31 first composer package released
 
 ## License
 
