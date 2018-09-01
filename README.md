@@ -22,6 +22,8 @@ Pinatra is a PHP copy of [Sinatra](https://github.com/sinatra/sinatra): a DSL fo
 composer require pinatra/framework=dev-master
 ```
 
+### run your own application!
+
 ```php
 require __DIR__.'/../vendor/autoload.php';
 
