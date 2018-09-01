@@ -8,9 +8,9 @@
 
 <br>
 
-Pinatra is a PHP verison of [Sinatra](https://github.com/sinatra/sinatra): a DSL for quickly creating web applications in PHP with minimal effort.
+Pinatra is a PHP copy of [Sinatra](https://github.com/sinatra/sinatra): a DSL for quickly creating web applications in PHP with minimal effort.
 
-> Pinatra is still under initial developing.
+> Pinatra is still under the initial development.
 
 <br>
 
