@@ -192,6 +192,9 @@ class Router {
             } else {
               $realMatched = [];
               foreach ($matched as $m) {
+                // just for :all with uri of 'foo/bar'
+                // this code makes blow strange `call_user_func_array` with `...$realMatched`
+                // please do not be confused
                 $realMatched[] = explode('/', $m);
               }
               call_user_func_array(self::$callbacks[$key], ...$realMatched);
