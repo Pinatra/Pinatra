@@ -21,7 +21,7 @@ class Router {
 
   public static $namespace = [];
 
-  public static $baseNamespace = 'App\Controller\\';
+  public static $baseNamespace = '\\';
 
   public static $prefix = [];
 
@@ -122,15 +122,18 @@ class Router {
     $method = $_SERVER['REQUEST_METHOD'];
     $searches = array_keys(static::$patterns);
     $replaces = array_values(static::$patterns);
-    $found_route = false;
+    $routeMatch = false;
     // check if route is defined without regex
     if (in_array($uri, self::$routes)) {
       $route_pos = array_keys(self::$routes, $uri);
-      $route =current($route_pos);  //取第一个匹配的路由
-     foreach ($route_pos as $route) {
+      $route = current($route_pos);
+      foreach ($route_pos as $route) {
 
         if (self::$methods[$route] == $method) {
-          $found_route = true;
+          if ($routeMatch) {
+            break;
+          }
+          $routeMatch = true;
 
           //if route is not an object
           if(!is_object(self::$callbacks[$route])){
@@ -152,7 +155,7 @@ class Router {
             call_user_func(self::$callbacks[$route]);
           }
         }
-     }
+      }
     } else {
       // check if defined with regex
       foreach (self::$routes as $key => $route) {
@@ -161,10 +164,7 @@ class Router {
         }
         if (preg_match('#^' . $route . '$#', $uri, $matched)) {
           if (self::$methods[$key] == $method) {
-            $found_route = true;
-
-            array_shift($matched); //remove $matched[0] as [1] is the first parameter.
-
+            $routeMatch = true;
 
             if(!is_object(self::$callbacks[$key])){
 
@@ -182,7 +182,7 @@ class Router {
 
               //call method and pass any extra parameters to the method
               $methodName = $segments[1];
-              return $controller->$methodName(implode(",", $matched));
+              return $controller->$methodName(...$matched);
             } else {
               call_user_func_array(self::$callbacks[$key], $matched);
             }
@@ -193,7 +193,7 @@ class Router {
     }
 
     // run the error callback if the route was not found
-    if ($found_route == false) {
+    if ($routeMatch == false) {
       if (!self::$error_callback) {
         self::$error_callback = function() {
           header($_SERVER['SERVER_PROTOCOL']." 404 Not Found");
