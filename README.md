@@ -30,7 +30,7 @@ get('/hi', function() {
 });
 ```
 
-## developing logs
+## Developing Logs
 
 * 2018-08-31 first composer package released
 
