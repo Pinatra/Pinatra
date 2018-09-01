@@ -129,10 +129,11 @@ class Router {
       $route = current($route_pos);
       foreach ($route_pos as $route) {
 
+        if ($routeMatch) {
+          break;
+        }
+
         if (self::$methods[$route] == $method) {
-          if ($routeMatch) {
-            break;
-          }
           $routeMatch = true;
 
           //if route is not an object
@@ -159,6 +160,11 @@ class Router {
     } else {
       // check if defined with regex
       foreach (self::$routes as $key => $route) {
+        
+        if ($routeMatch) {
+          break;
+        }
+
         if (strpos($route, ':') !== false) {
           $route = str_replace($searches, $replaces, $route);
         }
