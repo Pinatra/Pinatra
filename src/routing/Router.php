@@ -184,7 +184,11 @@ class Router {
               $methodName = $segments[1];
               return $controller->$methodName(...$matched);
             } else {
-              call_user_func_array(self::$callbacks[$key], $matched);
+              $realMatched = [];
+              foreach ($matched as $m) {
+                $realMatched[] = explode('/', $m);
+              }
+              call_user_func_array(self::$callbacks[$key], ...$realMatched);
             }
 
           }
