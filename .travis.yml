@@ -13,6 +13,6 @@ php:
 before_install:
   - phpenv config-rm xdebug.ini || true
   - travis_retry composer self-update
-  - composer update --prefer-dist --no-interaction
+  - travis_retry composer update --prefer-dist --no-interaction
 
 script: vendor/bin/phpunit
