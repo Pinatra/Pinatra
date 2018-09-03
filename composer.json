@@ -12,10 +12,18 @@
     "require": {
         "php": ">=7.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^6"
+    },
     "autoload": {
         "psr-4": {
             "Pinatra\\": "src"
         },
         "files": ["src/FirePinatra.php"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
     }
 }

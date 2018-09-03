@@ -36,4 +36,6 @@ function dispatch()
   Router::dispatch();
 }
 
-register_shutdown_function('dispatch');
+if (getenv('APP_ENV') != 'testing') {
+  register_shutdown_function('dispatch');
+}
