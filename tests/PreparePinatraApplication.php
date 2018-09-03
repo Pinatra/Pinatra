@@ -4,7 +4,7 @@ namespace Tests;
 
 trait PreparePinatraApplication
 {
-  public function setup()
+  public static function setUpBeforeClass()
   {
     $documentRoot = __DIR__.'/wwwroot';
     $output = [];
