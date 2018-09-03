@@ -33,6 +33,11 @@ get('/', function() {
 });
 ```
 
+## Documentation
+
+### [read the documentation](https://pinatra.github.io/)
+### [中文文档](https://pinatra.github.io/zh/)
+
 ## Developing Logs
 
 * 2018-08-31 first composer package released
