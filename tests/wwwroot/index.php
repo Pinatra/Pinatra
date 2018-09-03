@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'/../../vendor/autoload.php';
+require dirname(dirname(dirname(__FILE__))).'/vendor/autoload.php';
 
 get('/', function() {
   echo "GET /";
