@@ -159,6 +159,12 @@ class Router {
       }
     } else {
       // check if defined with regex
+      
+      $uriForPreg = $uri;
+      if (strpos($uri, '/') !== 0) {
+        $uriForPreg = '/'.$uriForPreg;
+      }
+
       foreach (self::$routes as $key => $route) {
         
         if ($routeMatch) {
@@ -168,7 +174,7 @@ class Router {
         if (strpos($route, ':') !== false) {
           $route = str_replace($searches, $replaces, $route);
         }
-        if (preg_match('#^' . $route . '$#', $uri, $matched)) {
+        if (preg_match('#^' . $route . '$#', $uriForPreg, $matched)) {
           if (self::$methods[$key] == $method) {
             $routeMatch = true;
 
@@ -192,6 +198,10 @@ class Router {
             } else {
               $realMatched = [];
               foreach ($matched as $m) {
+                if (strpos($m, '/') === 0) {
+                  $m = substr($m, 1);
+                }
+
                 // just for :all with uri of 'foo/bar'
                 // this code makes blow strange `call_user_func_array` with `...$realMatched`
                 // please do not be confused

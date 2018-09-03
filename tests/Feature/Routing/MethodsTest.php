@@ -14,6 +14,11 @@ class MethodsTest extends BaseTestCase
     $this->assertEquals(file_get_contents('http://127.0.0.1:50000/'), 'GET /');
   }
 
+  public function testSimpleGET()
+  {
+    $this->assertEquals(file_get_contents('http://127.0.0.1:50000/foo'), 'GET /foo');
+  }
+
   public function testPOST()
   {
     $opts = array('http' => [

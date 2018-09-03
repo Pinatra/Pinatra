@@ -30,5 +30,24 @@ head('/', function() {
   header('custom-header: hello Pinatra!');
 });
 
+get('/foo', function() {
+  echo "GET /foo";
+});
 
-register_shutdown_function('dispatch');
+get('/:num', function($a) {
+  echo "GET /:num ".$a;
+});
+
+get('/:any', function($a) {
+  echo "GET /:any ".$a;
+});
+
+get('/:all', function($a = 100, $b = 10000) {
+  echo "GET /:all ".$a.' '.$b;
+});
+
+
+if (getenv('APP_ENV') == 'testing') {
+  register_shutdown_function('dispatch');
+}
+
