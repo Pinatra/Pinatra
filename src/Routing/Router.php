@@ -184,6 +184,7 @@ class Router {
           if (self::$methods[$key] == $method) {
             $routeMatch = true;
 
+            // this can be object(Closure), if is, go to else
             if(!is_object(self::$callbacks[$key])){
 
               //grab all parts based on a / separator
