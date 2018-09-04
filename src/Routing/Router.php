@@ -116,7 +116,7 @@ class Router {
    * Example: View@process
    *
    */
-  public static function dispatch()
+  public static function dispatch($after = null)
   {
     $uri = self::detect_uri();
     $method = $_SERVER['REQUEST_METHOD'];
@@ -149,11 +149,17 @@ class Router {
             $controller = new $segments[0]();
 
             //call method
-            $methodName = $segments[1];
-            return $controller->$methodName();
+            $return = $controller->$segments[1]();
+
           } else {
             //call closure
-            call_user_func(self::$callbacks[$route]);
+            $return = call_user_func(self::$callbacks[$route]);
+          }
+
+          // call View processor
+          if ($after) {
+            $after_segments = explode('@', $after);
+            $after_segments[0]::{$after_segments[1]}($return);
           }
         }
       }
@@ -194,7 +200,7 @@ class Router {
 
               //call method and pass any extra parameters to the method
               $methodName = $segments[1];
-              return $controller->$methodName(...$matched);
+              $return = $controller->$methodName(...$matched);
             } else {
               $realMatched = [];
               foreach ($matched as $m) {
@@ -207,7 +213,13 @@ class Router {
                 // please do not be confused
                 $realMatched[] = explode('/', $m);
               }
-              call_user_func_array(self::$callbacks[$key], ...$realMatched);
+              $return = call_user_func_array(self::$callbacks[$key], ...$realMatched);
+            }
+
+            // call View processor
+            if ($after) {
+              $after_segments = explode('@', $after);
+              $after_segments[0]::{$after_segments[1]}($return);
             }
 
           }
