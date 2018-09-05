@@ -40,6 +40,7 @@ get('/', function() {
 
 ## Developing Logs
 
+* 2018-09-04 amazing new router is done
 * 2018-09-04 view is done
 * 2018-09-03 routing is done
 * 2018-08-31 first composer package released
