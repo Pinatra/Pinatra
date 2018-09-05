@@ -13,23 +13,17 @@ namespace Pinatra\Routing;
  */
 class Router {
 
-  public static $routes = array();
+  public static $routes = [];
 
-  public static $methods = array();
+  public static $methods = [];
 
-  public static $callbacks = array();
+  public static $callbacks = [];
 
   public static $namespace = [];
 
   public static $baseNamespace = '\\';
 
   public static $prefix = [];
-
-  public static $patterns = array(
-    ':any' => '[^/]+',
-    ':num' => '[0-9]+',
-    ':all' => '.*'
-  );
 
   public static $error_callback;
 
@@ -47,46 +41,27 @@ class Router {
    */
   public static function __callstatic($method, $params)
   {
-
-    if ( $method == 'group' ) {
-      if ( isset($params[0]['namespace']) ) {
-        self::$namespace[] = $params[0]['namespace'];
+    $uri = $params[0];
+    if ($uri === '') {
+      $uri = '/';
+    } else if ($uri === '/') {
+      // do nothing
+    } else {
+      if (strpos($uri, '/') === 0) {
+        $uri = substr($uri, 1);
       }
-      if ( isset($params[0]['prefix']) ) {
-        self::$prefix[] = $params[0]['prefix'];
-      }
-      $callback = $params[1];
-      $callback();
-      if ( isset($params[0]['namespace']) ) {
-        array_pop(self::$namespace);
-      }
-      if ( isset($params[0]['prefix']) ) {
-        array_pop(self::$prefix);
-      }
-    }else {
-      $nowPrefix = implode('/', self::$prefix);
-      if ( $nowPrefix ) {
-        $nowPrefix .= '/';
-      }
-      $nowNamespace = implode('\\',self::$namespace);
-      if ( $nowNamespace ) {
-        $nowNamespace .= '\\';
-      }
-      $uri = $nowPrefix.$params[0];
-      
-
-      if( !is_object($params[1]) ) {
-        $callback = self::$baseNamespace.$nowNamespace.$params[1];
-      }else {
-        $callback = $params[1];
-      }
-
-      if ( $method == 'any' ) {
-        self::pushToArray($uri, 'get', $callback);
-        self::pushToArray($uri, 'post', $callback);
-      } else {
-        self::pushToArray($uri, $method, $callback);
-      }
+    }
+    $callback = $params[1];
+    if ( $method == 'any' ) {
+      self::pushToArray($uri, 'get', $callback);
+      self::pushToArray($uri, 'post', $callback);
+      self::pushToArray($uri, 'put', $callback);
+      self::pushToArray($uri, 'patch', $callback);
+      self::pushToArray($uri, 'delete', $callback);
+      self::pushToArray($uri, 'options', $callback);
+      self::pushToArray($uri, 'head', $callback);
+    } else {
+      self::pushToArray($uri, $method, $callback);
     }
   }
 
@@ -120,8 +95,6 @@ class Router {
   {
     $uri = self::detect_uri();
     $method = $_SERVER['REQUEST_METHOD'];
-    $searches = array_keys(static::$patterns);
-    $replaces = array_values(static::$patterns);
     $routeMatch = false;
     // check if route is defined without regex
     if (in_array($uri, self::$routes)) {
@@ -133,6 +106,7 @@ class Router {
           break;
         }
 
+        // if HTTP method match GET POST PUT ...
         if (self::$methods[$route] == $method) {
           $routeMatch = true;
 
@@ -165,64 +139,80 @@ class Router {
       }
     } else {
       // check if defined with regex
-      
-      $uriForPreg = $uri;
-      if (strpos($uri, '/') !== 0) {
-        $uriForPreg = '/'.$uriForPreg;
-      }
 
       foreach (self::$routes as $key => $route) {
         
         if ($routeMatch) {
           break;
         }
+        if (preg_match('/\{.*?\}/', $route)) {
 
-        if (strpos($route, ':') !== false) {
-          $route = str_replace($searches, $replaces, $route);
-        }
-        if (preg_match('#^' . $route . '$#', $uriForPreg, $matched)) {
-          if (self::$methods[$key] == $method) {
-            $routeMatch = true;
+          $paramsIndexArray = [];
+          // notice that this $route is like /home/{name}
+          // explode('/', $route)[0] == ''
+          foreach (explode('/', $route) as $k => $v) {
+            if (preg_match('/\{.*?\}/', $v)) {
+              $paramsIndexArray[] = $k;
+            }
+          }
 
-            // this can be object(Closure), if is, go to else
-            if(!is_object(self::$callbacks[$key])){
+          $route = preg_replace('/\{.*?\}/', '[^/]+', $route);
 
-              //grab all parts based on a / separator
-              $parts = explode('/',self::$callbacks[$key]);
+          if (preg_match('#^' . $route . '$#', $uri, $matched)) {
 
-              //collect the last index of the array
-              $last = end($parts);
-
-              //grab the controller name and method call
-              $segments = explode('@',$last);
-
-              //instanitate controller
-              $controller = new $segments[0]();
-
-              //call method and pass any extra parameters to the method
-              $methodName = $segments[1];
-              $return = $controller->$methodName(...$matched);
-            } else {
-              $realMatched = [];
-              foreach ($matched as $m) {
-                if (strpos($m, '/') === 0) {
-                  $m = substr($m, 1);
-                }
-
-                // just for :all with uri of 'foo/bar'
-                // this code makes blow strange `call_user_func_array` with `...$realMatched`
-                // please do not be confused
-                $realMatched[] = explode('/', $m);
+            $realMatched = [];
+            foreach (explode('/', $matched[0]) as $k => $v) {
+              if (in_array($k, $paramsIndexArray)) {
+                $realMatched[] = $v;
               }
-              $return = call_user_func_array(self::$callbacks[$key], ...$realMatched);
             }
 
-            // call View processor
-            if ($after) {
-              $after_segments = explode('@', $after);
-              $after_segments[0]::{$after_segments[1]}($return);
-            }
+            if (self::$methods[$key] == $method) {
+              $routeMatch = true;
 
+              // this can be object(Closure), if is, go to else
+              if(!is_object(self::$callbacks[$key])){
+
+                //grab all parts based on a / separator
+                $parts = explode('/',self::$callbacks[$key]);
+
+                //collect the last index of the array
+                $last = end($parts);
+
+                //grab the controller name and method call
+                $segments = explode('@',$last);
+
+                //instanitate controller
+                $controller = new $segments[0]();
+
+                //call method and pass any extra parameters to the method
+                $methodName = $segments[1];
+                $method = new \ReflectionMethod($controller, $methodName);
+                $paramsCountDiff = count($method->getParameters()) - count($realMatched);
+                if ($paramsCountDiff > 0) {
+                  for ($i=0; $i < $paramsCountDiff; $i++) { 
+                    $realMatched[] = NULL;
+                  }
+                }
+                $return = call_user_func_array([$controller, $methodName], $realMatched);
+              } else {
+                $closureFunction = new \ReflectionFunction(self::$callbacks[$key]);
+                $paramsCountDiff = count($closureFunction->getParameters()) - count($realMatched);
+                if ($paramsCountDiff > 0) {
+                  for ($i=0; $i < $paramsCountDiff; $i++) { 
+                    $realMatched[] = NULL;
+                  }
+                }
+                $return = call_user_func_array(self::$callbacks[$key], $realMatched);
+              }
+
+              // call View processor
+              if ($after) {
+                $after_segments = explode('@', $after);
+                $after_segments[0]::{$after_segments[1]}($return);
+              }
+
+            }
           }
         }
       }
@@ -253,6 +243,9 @@ class Router {
       return '/';
     }
     $uri = parse_url($uri, PHP_URL_PATH);
+    if ($uri === NULL) {
+      return '/';
+    }
     return str_replace(array('//', '../'), '/', trim($uri, '/'));
   }
 }
