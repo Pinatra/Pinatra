@@ -19,8 +19,6 @@ class Router {
 
   public static $callbacks = [];
 
-  public static $namespace = [];
-
   public static $baseNamespace = '\\';
 
   public static $prefix = [];
@@ -120,14 +118,18 @@ class Router {
             //grab the controller name and method call
             $segments = explode('@',$last);
             //instanitate controller
-            $controller = new $segments[0]();
+            $controllerName = self::$baseNamespace.'\\'.$segments[0];
+            $controller = new $controllerName;
 
-            //call method
-            $return = $controller->$segments[1]();
-
+            //call method and pass any extra parameters to the method
+            $methodName = $segments[1];
+            $method = new \ReflectionMethod($controller, $methodName);
+            $nullParamsArray = array_fill(0, $method->getNumberOfRequiredParameters(), NULL);
+            $return = call_user_func_array([$controller, $methodName], $nullParamsArray);
           } else {
-            //call closure
-            $return = call_user_func(self::$callbacks[$route]);
+            $closureFunction = new \ReflectionFunction(self::$callbacks[$route]);
+            $nullParamsArray = array_fill(0, $closureFunction->getNumberOfRequiredParameters(), NULL);
+            $return = call_user_func_array(self::$callbacks[$route], $nullParamsArray);
           }
 
           // call View processor
@@ -183,12 +185,13 @@ class Router {
                 $segments = explode('@',$last);
 
                 //instanitate controller
-                $controller = new $segments[0]();
+                $controllerName = self::$baseNamespace.$segments[0];
+                $controller = new $controllerName;
 
                 //call method and pass any extra parameters to the method
                 $methodName = $segments[1];
                 $method = new \ReflectionMethod($controller, $methodName);
-                $paramsCountDiff = count($method->getParameters()) - count($realMatched);
+                $paramsCountDiff = $method->getNumberOfRequiredParameters() - count($realMatched);
                 if ($paramsCountDiff > 0) {
                   for ($i=0; $i < $paramsCountDiff; $i++) { 
                     $realMatched[] = NULL;
@@ -197,7 +200,7 @@ class Router {
                 $return = call_user_func_array([$controller, $methodName], $realMatched);
               } else {
                 $closureFunction = new \ReflectionFunction(self::$callbacks[$key]);
-                $paramsCountDiff = count($closureFunction->getParameters()) - count($realMatched);
+                $paramsCountDiff = $closureFunction->getNumberOfRequiredParameters() - count($realMatched);
                 if ($paramsCountDiff > 0) {
                   for ($i=0; $i < $paramsCountDiff; $i++) { 
                     $realMatched[] = NULL;
