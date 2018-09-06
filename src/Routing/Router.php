@@ -118,7 +118,7 @@ class Router {
             //grab the controller name and method call
             $segments = explode('@',$last);
             //instanitate controller
-            $controllerName = self::$baseNamespace.'\\'.$segments[0];
+            $controllerName = self::$baseNamespace.$segments[0];
             $controller = new $controllerName;
 
             //call method and pass any extra parameters to the method
