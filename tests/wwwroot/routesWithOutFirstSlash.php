@@ -41,7 +41,7 @@ options('', function() {
   echo "OPTIONS /";
 });
 
-head('', function() {
+headMethod('', function() {
   header('custom-header: hello Pinatra!');
 });
 
