@@ -40,6 +40,7 @@ get('/', function() {
 
 ## Developing Logs
 
+* 2018-09-08 Eloquent model done
 * 2018-09-06 new router is fine
 * 2018-09-04 amazing new router is done
 * 2018-09-04 view is done
