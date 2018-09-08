@@ -27,7 +27,7 @@ function options(...$params)
 {
   Router::options(...$params);
 }
-function head(...$params)
+function headMethod(...$params)
 {
   Router::head(...$params);
 }

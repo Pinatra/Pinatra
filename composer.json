@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": ">=7.0",
-        "filp/whoops": "*"
+        "filp/whoops": "*",
+        "illuminate/database": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^6"
