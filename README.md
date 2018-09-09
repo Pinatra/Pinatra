@@ -1,9 +1,9 @@
 <p align="center">
-    <a href="https://github.com/Pinatra/framework"><img src="https://github.com/Pinatra/framework/blob/master/assets/Pinatra.jpg"></a>
+    <a href="https://github.com/Pinatra/Pinatra"><img src="https://github.com/Pinatra/Pinatra/blob/master/assets/Pinatra.jpg"></a>
 </p>
 
 <p align="center">
-  <a href="https://travis-ci.org/Pinatra/framework"><img src="https://travis-ci.org/Pinatra/framework.svg?branch=master"></a>
+  <a href="https://travis-ci.org/Pinatra/Pinatra"><img src="https://travis-ci.org/Pinatra/Pinatra.svg?branch=master"></a>
   <a href="https://packagist.org/packages/pinatra/framework"><img src="https://poser.pugx.org/pinatra/framework/license.svg" alt="License"></a>
 </p>
 
