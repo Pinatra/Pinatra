@@ -11,7 +11,6 @@ class Model extends \Illuminate\Database\Eloquent\Model
   public function __construct()
   {
     if (!self::$fired) {
-      echo "=======".PHP_EOL;
       $capsule = new Manager;
       $capsule->addConnection(self::$config);
       $capsule->setAsGlobal();
