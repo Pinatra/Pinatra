@@ -34,18 +34,18 @@ function headMethod(...$params)
 
 function dispatch()
 {
-  Router::dispatch('\Pinatra\View\View@process');
-}
-
-function view($name = null)
-{
   try {
-    return View::make($name);
+    Router::dispatch('\Pinatra\View\View@process');
   } catch (Exception $e) {
     $whoops = new \Whoops\Run;
     $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
     $whoops->handleException($e);
   }
+}
+
+function view($name = null)
+{
+  return View::make($name);
 }
 
 if (getenv('APP_ENV') != 'testing') {
