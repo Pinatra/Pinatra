@@ -11,7 +11,6 @@ class MethodsTest extends BaseTestCase
 {
   public function testGET()
   {
-    var_dump(file_get_contents('http://127.0.0.1:50000/'));
     $this->assertEquals(file_get_contents('http://127.0.0.1:50000/'), 'GET /');
     $this->assertEquals(file_get_contents('http://127.0.0.1:50000/?slash=true'), 'GET /');
   }

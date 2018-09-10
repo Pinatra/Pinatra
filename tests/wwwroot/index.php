@@ -6,9 +6,7 @@ require 'HomeController.php';
 
 define('VIEW_BASE_PATH', __DIR__.'/');
 
-use SebastianBergmann\CodeCoverage\CodeCoverage;
-
-$coverage = new CodeCoverage;
+$coverage = new \SebastianBergmann\CodeCoverage\CodeCoverage;
 
 $coverage->filter()->addDirectoryToWhitelist(dirname(dirname(dirname(__FILE__))).'/src');
 
