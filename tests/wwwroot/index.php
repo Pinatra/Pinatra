@@ -12,7 +12,7 @@ $coverage = new CodeCoverage;
 
 $coverage->filter()->addDirectoryToWhitelist(dirname(dirname(dirname(__FILE__))).'/src');
 
-$coverage->start('ooxx');
+$coverage->start('ooxx')
 
 // test 'foo' and '/foo'
 if (@$_GET['slash']) {
