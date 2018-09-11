@@ -1,3 +1,4 @@
 /vendor
 composer.lock
 tests/wwwroot/code-coverage-report
+tests/wwwroot/DatabaseConfig.php
