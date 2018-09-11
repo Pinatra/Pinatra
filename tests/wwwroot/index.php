@@ -27,6 +27,9 @@ require 'whatNeedsToDoToIncreasingCodeCoverage.php';
 get('model', function() {
   print_r(User::all());
 });
+get('db', function() {
+  print_r(\Pinatra\Model\DB::table('users')->get());
+});
 
 if (getenv('APP_MACHINE') == 'MAC') {
   register_shutdown_function(function() use ($coverage) {
