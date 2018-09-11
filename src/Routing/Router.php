@@ -225,8 +225,8 @@ class Router {
     if ($routeMatch == false) {
       if (!self::$error_callback) {
         self::$error_callback = function() {
-          header($_SERVER['SERVER_PROTOCOL']." 404 Not Found");
           echo '404';
+          // throw new \Exception('404 Not Found', 1);
         };
       }
       call_user_func(self::$error_callback);

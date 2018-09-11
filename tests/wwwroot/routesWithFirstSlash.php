@@ -49,9 +49,11 @@ headMethod('/', function() {
 //    for view tests
 // ========================
 get('/view/simple', function() {
+  define('VIEW_BASE_PATH', VIEW_BASE_PATH_PREPARE);
   return view('testView');
 });
 get('/view/with-data/{a}/{b}/{c}', function($a, $b, $c) {
+  define('VIEW_BASE_PATH', VIEW_BASE_PATH_PREPARE);
   return view('testView')->with('a', $a)
                          ->withB($b)
                          ->withSnakeVar($c);

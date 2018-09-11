@@ -48,9 +48,7 @@ function view($name = null)
   return View::make($name);
 }
 
-if (getenv('APP_ENV') != 'testing') {
-  register_shutdown_function('dispatch');
-}
+register_shutdown_function('dispatch');
 
 $whoops = new \Whoops\Run;
 $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
