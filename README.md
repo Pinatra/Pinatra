@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Pinatra/Pinatra/releases/latest"><img src="https://badge.fury.io/gh/Pinatra%2FPinatra.svg" alt="GitHub version" height="18"></a>
+  <a href="https://packagist.org/packages/pinatra/framework"><img src="https://poser.pugx.org/pinatra/framework/v/stable" alt="GitHub version" height="18"></a>
   <a href="https://github.com/Pinatra/Pinatra"><img src="https://img.shields.io/badge/Code_Coverage-100%25-brightgreen.svg" alt="code-coverage"></a>
   <a href="https://github.com/Pinatra/Pinatra"><img src="https://img.shields.io/badge/PHP-7.0%2B-orange.svg" alt="php-version"></a>
   <a href="https://packagist.org/packages/pinatra/framework"><img src="https://poser.pugx.org/pinatra/framework/license.svg" alt="License"></a>
