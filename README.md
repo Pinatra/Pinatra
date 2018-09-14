@@ -25,7 +25,7 @@ Pinatra is a PHP copy of [Sinatra](https://github.com/sinatra/sinatra): a DSL fo
 ### install
 
 ```bash
-composer require pinatra/framework=dev-master
+composer require pinatra/framework=~0.0
 ```
 
 ### run your own application!
