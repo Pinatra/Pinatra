@@ -43,6 +43,20 @@ get('/', function() {
 ### [read the documentation](https://pinatra.github.io/)
 ### [中文文档](https://pinatra.github.io/zh/)
 
+## Request processing flow
+
+![Request processing flow](https://github.com/Pinatra/Pinatra/blob/master/assets/kernel.jpg)
+
+## Benchmark
+
+### Hello World
+
+![benchmark](https://github.com/Pinatra/Pinatra/blob/master/assets/bm1.png)
+
+### Simple api with MySQL
+
+![benchmark](https://github.com/Pinatra/Pinatra/blob/master/assets/bm2.png)
+
 ## Developing Logs
 
 * 2018-09-11 100% code-coverage done
