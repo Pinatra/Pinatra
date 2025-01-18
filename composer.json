@@ -12,16 +12,19 @@
     "require": {
         "php": ">=7.0",
         "filp/whoops": "*",
-        "illuminate/database": "*"
+        "illuminate/database": "*",
+        "nikic/fast-route": "^1.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
             "Pinatra\\": "src/"
         },
-        "files": ["src/FirePinatra.php"]
+        "files": [
+            "src/FirePinatra.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

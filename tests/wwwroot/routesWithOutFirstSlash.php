@@ -14,7 +14,7 @@ get('foo', function() {
 get('foo/{a}', function($a) {
   echo "GET /foo/".$a;
 });
-get('bar/{a}', function($a, $b) {
+get('bar/{a}', function($a, $b = null) {
   echo "GET /bar/".$a.'/'.($b ?? 'NULL');
 });
 get('one/{a}', 'HomeController@one');
@@ -48,12 +48,11 @@ headMethod('', function() {
 // ========================
 //    for view tests
 // ========================
+define('VIEW_BASE_PATH', VIEW_BASE_PATH_PREPARE);
 get('view/simple', function() {
-  define('VIEW_BASE_PATH', VIEW_BASE_PATH_PREPARE);
   return view('testView');
 });
 get('view/with-data/{a}/{b}/{c}', function($a, $b, $c) {
-  define('VIEW_BASE_PATH', VIEW_BASE_PATH_PREPARE);
   return view('testView')->with('a', $a)
                          ->withB($b)
                          ->withSnakeVar($c);

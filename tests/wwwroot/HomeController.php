@@ -9,7 +9,7 @@ class HomeController
   {
     echo 'GET /one/'.$a;
   }
-  public function two($a, $b)
+  public function two($a, $b = null)
   {
     echo 'GET /two/'.$a.'/'.($b ?? 'NULL');
   }
@@ -23,7 +23,6 @@ class HomeController
   }
   public function emptyViewName()
   {
-    define('VIEW_BASE_PATH', VIEW_BASE_PATH_PREPARE);
     return view();
   }
 }

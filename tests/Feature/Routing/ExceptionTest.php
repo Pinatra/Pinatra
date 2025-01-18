@@ -17,8 +17,8 @@ class ExceptionTest extends BaseTestCase
       )
     ));
     $result = file_get_contents('http://127.0.0.1:50000/exception', false, $context);
-    $this->assertContains('Exception: On Pupose HaHa!', $result);
-    $this->assertContains('Whoops! There was an error.', $result);
+    $this->assertStringContainsString('Exception: On Pupose HaHa!', $result);
+    $this->assertStringContainsString('Whoops! There was an error.', $result);
   }
   public function testViewExceptions()
   {
@@ -28,11 +28,11 @@ class ExceptionTest extends BaseTestCase
       )
     ));
     $result = file_get_contents('http://127.0.0.1:50000/exception/no-VIEW_BASE_PATH', false, $context);
-    $this->assertContains('VIEW_BASE_PATH is undefined!', $result);
-    $this->assertContains('Whoops! There was an error.', $result);
+    $this->assertStringContainsString('VIEW_BASE_PATH is undefined!', $result);
+    $this->assertStringContainsString('Whoops! There was an error.', $result);
 
     $result = file_get_contents('http://127.0.0.1:50000/exception/empty-view-name', false, $context);
-    $this->assertContains('View name can not be empty!', $result);
-    $this->assertContains('Whoops! There was an error.', $result);
+    $this->assertStringContainsString('View name can not be empty!', $result);
+    $this->assertStringContainsString('Whoops! There was an error.', $result);
   }
 }

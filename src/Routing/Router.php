@@ -1,254 +1,114 @@
 <?php
-
 namespace Pinatra\Routing;
 
-/**
- * @method static Router get(string $route, Callable $callback)
- * @method static Router post(string $route, Callable $callback)
- * @method static Router put(string $route, Callable $callback)
- * @method static Router patch(string $route, Callable $callback)
- * @method static Router delete(string $route, Callable $callback)
- * @method static Router options(string $route, Callable $callback)
- * @method static Router head(string $route, Callable $callback)
- */
-class Router {
+use FastRoute\Dispatcher;
+use FastRoute\RouteCollector;
+use function FastRoute\simpleDispatcher;
 
-  public static $routes = [];
+class Router
+{
+    private static $routes = [];
+    private static $currentGroup = '';
+    public static $baseNamespace = '\\';
 
-  public static $methods = [];
-
-  public static $callbacks = [];
-
-  public static $baseNamespace = '\\';
-
-  public static $prefix = [];
-
-  public static $error_callback;
-
-  /**
-   * add filter for your routes
-   */
-  public static function filter($filter, $result) {
-    if ($filter()) {
-      $result();
+    public static function group($prefix, $callback)
+    {
+        $previousGroup = self::$currentGroup;
+        self::$currentGroup .= $prefix;
+        $callback();
+        self::$currentGroup = $previousGroup;
     }
-  }
 
-  /**
-   * Defines a route w/ callback and method
-   */
-  public static function __callstatic($method, $params)
-  {
-    $uri = $params[0];
-    if ($uri === '') {
-      $uri = '/';
-    } else if ($uri === '/') {
-      // do nothing
-    } else {
-      if (strpos($uri, '/') === 0) {
-        $uri = substr($uri, 1);
-      }
+    private static function addRoute($method, $path, $handler)
+    {
+        self::$routes[] = [
+            'method' => $method,
+            'path' => ltrim($path, '/'),
+            'handler' => $handler
+        ];
     }
-    $callback = $params[1];
-    if ( $method == 'any' ) {
-      self::pushToArray($uri, 'get', $callback);
-      self::pushToArray($uri, 'post', $callback);
-      self::pushToArray($uri, 'put', $callback);
-      self::pushToArray($uri, 'patch', $callback);
-      self::pushToArray($uri, 'delete', $callback);
-      self::pushToArray($uri, 'options', $callback);
-      self::pushToArray($uri, 'head', $callback);
-    } else {
-      self::pushToArray($uri, $method, $callback);
+
+    public static function get($path, $handler)
+    {
+        self::addRoute('GET', $path, $handler);
     }
-  }
 
-  /**
-   * Push route items to class arrays
-   *
-   */
-  public static function pushToArray($uri, $method, $callback)
-  {
-    array_push(self::$routes, $uri);
-    array_push(self::$methods, strtoupper($method));
-    array_push(self::$callbacks, $callback);
-  }
+    public static function post($path, $handler)
+    {
+        self::addRoute('POST', $path, $handler);
+    }
 
-  /**
-   * Defines callback if route is not found
-  */
-  public static function error($callback)
-  {
-    self::$error_callback = $callback;
-  }
+    public static function put($path, $handler)
+    {
+        self::addRoute('PUT', $path, $handler);
+    }
 
-  /**
-   * Runs the callback for the given request
-   *
-   * $after: Processor After. It will process the value returned by Controller.
-   * Example: View@process
-   *
-   */
-  public static function dispatch($after = null)
-  {
-    $uri = self::detect_uri();
-    $method = $_SERVER['REQUEST_METHOD'];
-    $routeMatch = false;
-    // check if route is defined without regex
-    if (in_array($uri, self::$routes)) {
-      $route_pos = array_keys(self::$routes, $uri);
-      $route = current($route_pos);
-      foreach ($route_pos as $route) {
+    public static function delete($path, $handler)
+    {
+        self::addRoute('DELETE', $path, $handler);
+    }
 
-        if ($routeMatch) {
-          break;
+    public static function patch($path, $handler)
+    {
+        self::addRoute('PATCH', $path, $handler);
+    }
+
+    public static function options($path, $handler)
+    {
+        self::addRoute('OPTIONS', $path, $handler);
+    }
+
+    public static function head($path, $handler)
+    {
+        self::addRoute('HEAD', $path, $handler);
+    }
+
+    private static function resolveHandler($handler)
+    {
+        if (is_string($handler) && strpos($handler, '@') !== false) {
+            list($class, $method) = explode('@', $handler);
+            if ($class[0] !== '\\') {
+                $class = self::$baseNamespace . $class;
+            }
+            $controller = new $class();
+            return [$controller, $method];
         }
+        return $handler;
+    }
 
-        // if HTTP method match GET POST PUT ...
-        if (self::$methods[$route] == $method) {
-          $routeMatch = true;
-
-          //if route is not an object
-          if(!is_object(self::$callbacks[$route])){
-
-            //grab all parts based on a / separator
-            $parts = explode('/',self::$callbacks[$route]);
-            //collect the last index of the array
-            $last = end($parts);
-            //grab the controller name and method call
-            $segments = explode('@',$last);
-            //instanitate controller
-            $controllerName = self::$baseNamespace.$segments[0];
-            $controller = new $controllerName;
-
-            //call method and pass any extra parameters to the method
-            $methodName = $segments[1];
-            $method = new \ReflectionMethod($controller, $methodName);
-            $nullParamsArray = array_fill(0, $method->getNumberOfRequiredParameters(), NULL);
-            $return = call_user_func_array([$controller, $methodName], $nullParamsArray);
-          } else {
-            $closureFunction = new \ReflectionFunction(self::$callbacks[$route]);
-            $nullParamsArray = array_fill(0, $closureFunction->getNumberOfRequiredParameters(), NULL);
-            $return = call_user_func_array(self::$callbacks[$route], $nullParamsArray);
-          }
-
-          // call View processor
-          if ($after) {
-            $after_segments = explode('@', $after);
-            $after_segments[0]::{$after_segments[1]}($return);
-          }
-        }
-      }
-    } else {
-      // check if defined with regex
-
-      foreach (self::$routes as $key => $route) {
+    public static function dispatch($method, $uri, $after = null)
+    {
+        static $dispatcher = null;
         
-        if ($routeMatch) {
-          break;
-        }
-        if (preg_match('/\{.*?\}/', $route)) {
-
-          $paramsIndexArray = [];
-          // notice that this $route is like /home/{name}
-          // explode('/', $route)[0] == ''
-          foreach (explode('/', $route) as $k => $v) {
-            if (preg_match('/\{.*?\}/', $v)) {
-              $paramsIndexArray[] = $k;
-            }
-          }
-
-          $route = preg_replace('/\{.*?\}/', '[^/]+', $route);
-
-          if (preg_match('#^' . $route . '$#', $uri, $matched)) {
-
-            $realMatched = [];
-            foreach (explode('/', $matched[0]) as $k => $v) {
-              if (in_array($k, $paramsIndexArray)) {
-                $realMatched[] = $v;
-              }
-            }
-
-            if (self::$methods[$key] == $method) {
-              $routeMatch = true;
-
-              // this can be object(Closure), if is, go to else
-              if(!is_object(self::$callbacks[$key])){
-
-                //grab all parts based on a / separator
-                $parts = explode('/',self::$callbacks[$key]);
-
-                //collect the last index of the array
-                $last = end($parts);
-
-                //grab the controller name and method call
-                $segments = explode('@',$last);
-
-                //instanitate controller
-                $controllerName = self::$baseNamespace.$segments[0];
-                $controller = new $controllerName;
-
-                //call method and pass any extra parameters to the method
-                $methodName = $segments[1];
-                $method = new \ReflectionMethod($controller, $methodName);
-                $paramsCountDiff = $method->getNumberOfRequiredParameters() - count($realMatched);
-                if ($paramsCountDiff > 0) {
-                  for ($i=0; $i < $paramsCountDiff; $i++) { 
-                    $realMatched[] = NULL;
-                  }
+        if ($dispatcher === null) {
+            $dispatcher = simpleDispatcher(function(RouteCollector $r) {
+                foreach (self::$routes as $route) {
+                    $r->addRoute($route['method'], self::$currentGroup . $route['path'], $route['handler']);
                 }
-                $return = call_user_func_array([$controller, $methodName], $realMatched);
-              } else {
-                $closureFunction = new \ReflectionFunction(self::$callbacks[$key]);
-                $paramsCountDiff = $closureFunction->getNumberOfRequiredParameters() - count($realMatched);
-                if ($paramsCountDiff > 0) {
-                  for ($i=0; $i < $paramsCountDiff; $i++) { 
-                    $realMatched[] = NULL;
-                  }
-                }
-                $return = call_user_func_array(self::$callbacks[$key], $realMatched);
-              }
-
-              // call View processor
-              if ($after) {
-                $after_segments = explode('@', $after);
-                $after_segments[0]::{$after_segments[1]}($return);
-              }
-
-            }
-          }
+            });
         }
-      }
-    }
 
-    // run the error callback if the route was not found
-    if ($routeMatch == false) {
-      if (!self::$error_callback) {
-        self::$error_callback = function() {
-          echo '404';
-          // throw new \Exception('404 Not Found', 1);
-        };
-      }
-      call_user_func(self::$error_callback);
+        $path = parse_url($uri, PHP_URL_PATH);
+        $path = $path ? rtrim(ltrim($path, '/'), '/') : '/';
+        $routeInfo = $dispatcher->dispatch($method, $path);
+        
+        switch ($routeInfo[0]) {
+            case Dispatcher::NOT_FOUND:
+                return false;
+            case Dispatcher::METHOD_NOT_ALLOWED:
+                return false;
+            case Dispatcher::FOUND:
+                $handler = self::resolveHandler($routeInfo[1]);
+                $vars = $routeInfo[2];
+                $return = call_user_func_array($handler, $vars);
+                
+                // call View processor
+                if ($after) {
+                    $after_segments = explode('@', $after);
+                    $after_segments[0]::{$after_segments[1]}($return);
+                }
+                
+                return $return;
+        }
     }
-  }
-
-  // detect true URI, inspired by CodeIgniter 2
-  private static function detect_uri()
-  {
-    $uri = $_SERVER['REQUEST_URI'];
-    if (strpos($uri, $_SERVER['SCRIPT_NAME']) === 0) {
-      $uri = substr($uri, strlen($_SERVER['SCRIPT_NAME']));
-    } elseif (strpos($uri, dirname($_SERVER['SCRIPT_NAME'])) === 0) {
-      $uri = substr($uri, strlen(dirname($_SERVER['SCRIPT_NAME'])));
-    }
-    if ($uri == '/' || empty($uri)) {
-      return '/';
-    }
-    $uri = parse_url($uri, PHP_URL_PATH);
-    if ($uri === NULL) {
-      return '/';
-    }
-    return str_replace(array('//', '../'), '/', trim($uri, '/'));
-  }
 }

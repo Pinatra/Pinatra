@@ -35,7 +35,11 @@ function headMethod(...$params)
 function dispatch()
 {
   try {
-    Router::dispatch('\Pinatra\View\View@process');
+    $result = Router::dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], '\Pinatra\View\View@process');
+    if ($result === false) {
+      http_response_code(404);
+      echo '404 Not Found';
+    }
   } catch (Exception $e) {
     $whoops = new \Whoops\Run;
     $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
