@@ -1,4 +1,5 @@
 {
+    "version": "0.1.0",
     "name": "pinatra/framework",
     "description": "Pinatra is a PHP verison of Sinatra: a DSL for quickly creating web applications in PHP with minimal effort.",
     "type": "library",
